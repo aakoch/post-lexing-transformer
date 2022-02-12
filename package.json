@@ -1,0 +1,44 @@
+{
+  "name": "post-lexing-transformer",
+  "version": "0.0.0",
+  "description": "Post processing",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "mkdir -p dist && cp src/index.js dist/",
+    "test": "c8 tap --no-coverage"
+  },
+  "keywords": [
+    "stream",
+    "transformer",
+    "lexer",
+    "parser",
+    "pug",
+    "foo-dog",
+    "foodog",
+    "foo dog"
+  ],
+  "author": "Adam Koch (aakoch)",
+  "license": "MIT",
+  "dependencies": {
+    "@foo-dog/utils": "file:../utils",
+    "@jaredpalmer/wrapline": "^2.0.2",
+    "chai-equal-for-long-text": "^0.2.1",
+    "chalk": "^4.1.2",
+    "command-line-args": "^5.2.0",
+    "command-line-usage": "^6.1.1",
+    "concat-stream": "^2.0.0",
+    "debug": "^4.3.2",
+    "indent-transformer": "file:../indent-transformer",
+    "minimist": "^1.2.5",
+    "pug-lexing-transformer": "file:../pug-lexing-transformer",
+    "pug-line-lexer": "file:../pug-line-lexer"
+  },
+  "type": "module",
+  "devDependencies": {
+    "c8": "^7.11.0",
+    "dyp": "^1.0.1",
+    "filecompare": "^1.0.4",
+    "nyc": "^15.1.0",
+    "tap": "^15.1.5"
+  }
+}
