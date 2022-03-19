@@ -1,57 +1,71 @@
 import stream from 'stream'
-import path from 'path';
 import debugFunc from 'debug'
+import { inspect } from 'node:util'
 const debug = debugFunc('post-lexing-transformer')
 
 class PostLexingTransformer extends stream.Transform {
-  first = true;
-  currentIndent = 0;
-  state = []
-  stack = {
-    internalArr: [],
-    debug: debugFunc('stack'),
-    push: function (txt) {
-      // this.debug('pushing: ', txt)
-      this.length++
-      // this.debug('length: ', this.length)
-      this.internalArr.push(txt)
-    },
-    pop: function () {
-      let txt = this.internalArr.pop()
-      this.length--
-      return txt
-    },
-    length: 0
-  }
-  lineNo = 0
-  buffer = []
-  useAbsolutePath = true
-  filesToAlsoParse = []
-  override
-
   constructor(options) {
     super({ decodeStrings: true, encoding: 'utf8', objectMode: true })
     debug('entering constuctor')
+    this.hadError = false
+  }
+  _flush(callback) {
+    debug('entering _flush')
+    debug('_flush(): this.hadError: ' + this.hadError)
+    debug('Pulling previous string: ' + this.previousStr)
+    callback(this.previousStr)
+    debug('exiting _flush')
   }
   _transform(str, enc, callback) {
-    const startIdx = str.indexOf('attrs_start')
-    if (startIdx > -1) {
-      // This is the object-based approach
-      const jsonObject = JSON.parse(str)
-      debug('jsonObject in=', jsonObject)
-      jsonObject.attrs = []
-      jsonObject.attrs.push(...jsonObject.attrs_start)
-      jsonObject.attrs.push(...jsonObject.children[0].val)
-      delete jsonObject.attrs_start
-      delete jsonObject.children
-      debug('jsonObject out=', jsonObject)
+      debug('str=', str)
 
-      this.push(JSON.stringify(jsonObject))
+      let jsonStr
+      // This is the object-based approach
+      debug('this.hadError: ' + this.hadError)
+      if (typeof this.previousStr !== 'undefined') {
+        debug('Pulling previous string: ' + this.previousStr)
+        jsonStr = this.previousStr + str
+        debug('combined string=', jsonStr)
+        delete this.previousStr
+        this.hadError = false
+      } else {
+        jsonStr = str
+      }
+
+      try {
+
+      const startIdx = jsonStr.indexOf('attrs_start')
+      if (startIdx > -1) {
+
+        const jsonObject = JSON.parse(jsonStr)[0]
+        debug('jsonObject=', inspect(jsonObject, false, 4))
+        jsonObject.attrs = []
+        debug('jsonObject.attrs_start=', jsonObject.attrs_start)
+        jsonObject.attrs.push(...jsonObject.attrs_start)
+        jsonObject.attrs.push(...jsonObject.children[0].val)
+        delete jsonObject.attrs_start
+        delete jsonObject.children
+        debug('jsonObject out=', jsonObject)
+
+        this.push(JSON.stringify(jsonObject))
+      } else {
+        this.push(jsonStr)
+      }
+      callback()
+    } catch (e) {
+      if (e.name === 'SyntaxError') {
+        // const newError = new Error('Error parsing JSON input: \n\t' + str + '\nError message was: ' + e.message, { cause: e });
+        // callback(newError)
+        debug('SyntaxError: ', jsonStr)
+        this.hadError = true
+        this.previousStr = jsonStr
+        // this.unshift(jsonStr)
+        // this.push('')
+        callback()
+      } else {
+        callback(e)
+      }
     }
-    else {
-      this.push(str)
-    }
-    callback();
   }
 }
 
@@ -82,12 +96,10 @@ function findString(str, idx) {
     const char = str.charAt(leftBracketIdx + charIndex)
     if (char === '[') {
       leftBracketCount++
-    }
-    else if (char === ']') {
+    } else if (char === ']') {
       if (leftBracketCount == 0) {
         endBracketFound = true
-      }
-      else {
+      } else {
         leftBracketCount--
       }
     }

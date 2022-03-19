@@ -3,6 +3,12 @@
 
 Finds attrs_start and attrs_end and merges them
 
+## TODO
+
+Unfortunately, this no longer works. Not sure what I did to break it. 
+
+The TODO is to fix it.
+
 ## Command line usage (from pug-lexing-transformer)
 
 ```
