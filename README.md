@@ -9,7 +9,7 @@ Unfortunately, this no longer works. Not sure what I did to break it.
 
 The TODO is to fix it.
 
-## Command line usage (from pug-lexing-transformer)
+## Command line usage (from lexing-transformer)
 
 ```
 node src/cli.js test/files/interpolated-mixin.in
