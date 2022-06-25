@@ -17,26 +17,24 @@ class PostLexingTransformer extends stream.Transform {
     debug('exiting _flush')
   }
   _transform(str, enc, callback) {
-      debug('str=', str)
+    debug('str=', str)
 
-      let jsonStr
-      // This is the object-based approach
-      debug('this.hadError: ' + this.hadError)
-      if (typeof this.previousStr !== 'undefined') {
-        debug('Pulling previous string: ' + this.previousStr)
-        jsonStr = this.previousStr + str
-        debug('combined string=', jsonStr)
-        delete this.previousStr
-        this.hadError = false
-      } else {
-        jsonStr = str
-      }
+    let jsonStr
+    // This is the object-based approach
+    debug('this.hadError: ' + this.hadError)
+    if (typeof this.previousStr !== 'undefined') {
+      debug('Pulling previous string: ' + this.previousStr)
+      jsonStr = this.previousStr + str
+      debug('combined string=', jsonStr)
+      delete this.previousStr
+      this.hadError = false
+    } else {
+      jsonStr = str
+    }
 
-      try {
-
+    try {
       const startIdx = jsonStr.indexOf('attrs_start')
       if (startIdx > -1) {
-
         const jsonObject = JSON.parse(jsonStr)[0]
         debug('jsonObject=', inspect(jsonObject, false, 4))
         jsonObject.attrs = []
