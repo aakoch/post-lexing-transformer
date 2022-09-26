@@ -30,7 +30,9 @@
     "command-line-args": "^5.2.0",
     "command-line-usage": "^6.1.1",
     "concat-stream": "^2.0.0",
-    "debug": "^4.3.2"
+    "debug": "^4.3.2",
+    "jsonpath": "^1.1.1",
+    "node-jq": "^2.3.3"
   },
   "type": "module",
   "devDependencies": {
@@ -38,6 +40,6 @@
     "dyp": "^1.0.1",
     "filecompare": "^1.0.4",
     "nyc": "^15.1.0",
-    "tap": "^15.1.5"
+    "tap": "^16.3.0"
   }
 }
